@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 st.title("👨‍💻 Mon Portfolio")
 st.write("Nathan Chan Sing Man - Portfolio")
@@ -100,30 +100,47 @@ def main():
 
     elif selection == "RATP":
             st.header("🚇 Données RATP")
-            st.write("Aperçu des données d'Ile de France RATP:")
+            st.write("Aperçu des données d'Ile de France RATP: ")
             
             df = pd.read_csv("emplacement-des-gares-idf.csv",sep=";")  
-            st.write(df.head(10)) 
+            st.write(df.head(5)) 
 
             # Graphique sur le nombre de stations par ligne de métro 
             stations_par_ligne = df['indice_lig'].value_counts().sort_index()
-            st.write(stations_par_ligne.head(10)) 
-            
             # Titre
             st.title("Nombre de stations par ligne de métro")
+            # Création du graphique avec Plotly Express
+            fig = px.bar(
+                x=stations_par_ligne.index,
+                y=stations_par_ligne.values,
+                labels={"x": "ligne de metro", "y": "Nombre de stations sur la ligne"},
+                title="Stations par ligne de métro",
+                color=stations_par_ligne.values,
+                color_continuous_scale="Blues"
+            )
 
-            # Graphique avec matplotlib
-            fig, ax = plt.subplots()
-            stations_par_ligne.plot(kind='bar', ax=ax, color='skyblue')
-            ax.set_xlabel("Indice de ligne")
-            ax.set_ylabel("Nombre de stations")
-            ax.set_title("Stations par ligne de métro")
+            # Forcer un pas de 1 sur l'axe X
+            fig.update_xaxes(dtick=1)
 
             # Affichage dans Streamlit
-            st.pyplot(fig)
+            st.plotly_chart(fig, use_container_width=True)
 
+            # Comptage du nombre de stations par exploitant
+            stations_par_exploitant = df['exploitant'].value_counts()
 
+            # Titre
+            st.title("Répartition des stations par exploitant")
 
+            # Création du camembert avec Plotly Express
+            fig = px.pie(
+                names=stations_par_exploitant.index,
+                values=stations_par_exploitant.values,
+                title="Répartition des lignes ferroviaire en Ile de France",
+                color_discrete_sequence=px.colors.qualitative.Set3  # palette sympa
+            )
+
+            # Affichage dans Streamlit
+            st.plotly_chart(fig, use_container_width=True)
 
 
 
